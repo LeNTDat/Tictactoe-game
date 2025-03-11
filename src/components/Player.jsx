@@ -9,15 +9,18 @@ export default function Player(props) {
     }
 
     const handleSetInput = (e)=>{
-        console.log(e.target.id)
         setPlayerName(e.target.value)
+        props.setPlayer({
+            name: e.target.value,
+            symbol: props.symbol
+        })
     }
-
-    return <li>
+    
+    return <li className={`${props.currentPlayer === props.symbol && "active"}`}>
         <span className="player">
-            <input id={"asdqw"} value={playerName} onChange={handleSetInput} disabled={!isEditting}></input>
+            <input value={playerName} onChange={handleSetInput} disabled={!isEditting || props.isStart}></input>
             <span className="player-symbol">{props.symbol}</span>
         </span>
-        <button onClick={handleOnEdit}>{!isEditting ? "Edit" : "Save"}</button>
+        {!props.isStart && <button onClick={handleOnEdit}>{!isEditting ? "Edit" : "Save"}</button>}
     </li>
 }
