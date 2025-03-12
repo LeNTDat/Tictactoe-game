@@ -1,4 +1,3 @@
-import { useState } from "react"
 
 const iniitialGameBoard = [
     [null, null, null],
@@ -7,15 +6,12 @@ const iniitialGameBoard = [
 ]
 
 export default function GameBoard(props) {
-    const [board, setBoard] = useState(iniitialGameBoard);
-
-    const handleOnChecksymbol = (rowIndex, colIndex)=>{
-        setBoard(prev =>{
-            let updatedBoard = [...prev.map(innerArr =>[...innerArr])]
-            updatedBoard[rowIndex][colIndex] = props.symbol;
-            return updatedBoard;
-        })
-        props.handlePlayerTurns(props.symbol)
+    let board = iniitialGameBoard;
+    for (let turn of props.turns){
+        const {position, player} = turn;
+        const {row, col} = position;
+        
+        board[row][col] = player;
     }
 
     return <ol id="game-board">
@@ -23,7 +19,7 @@ export default function GameBoard(props) {
             <ol>
                 {row.map((playerSymbol, colIndex) => <li key={colIndex}>
                     <button disabled={playerSymbol} onClick={()=>{
-                        handleOnChecksymbol(rowIndex, colIndex)
+                        props.handlePlayerTurns(rowIndex, colIndex)
                     }}>{playerSymbol}</button>
                 </li>)}
             </ol>
