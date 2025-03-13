@@ -2,6 +2,7 @@ import { useState } from "react"
 import GameBoard from "./components/GameBoard"
 import Player from "./components/Player"
 import Log from "./components/Log";
+import { WINNING_TEMPLATE } from "./Winning_template";
 
 const firstRun = !Math.round(Math.random());
 
@@ -9,14 +10,38 @@ function App() {
   const [startGame, setStartGame] = useState(false);
   const [gameTurn, setGameTurn] = useState([])
 
-  const deriveActivePlayer = (gameTurn)=>{
+  const iniitialGameBoard = [
+    [null, null, null],
+    [null, null, null],
+    [null, null, null]
+  ]
+  let board = iniitialGameBoard;
+  let winner = null;
+  for (let turn of gameTurn) {
+    const { position, player } = turn;
+    const { row, col } = position;
+
+    board[row][col] = player;
+  }
+
+  const deriveActivePlayer = (gameTurn) => {
     let currentPlayer = "X";
-    if(gameTurn.length > 0 && gameTurn[0].player === "X"){
+    if (gameTurn.length > 0 && gameTurn[0].player === "X") {
       currentPlayer = "O"
     }
     return currentPlayer;
   }
-  let currentPlayer = deriveActivePlayer(gameTurn) ;
+  let currentPlayer = deriveActivePlayer(gameTurn);
+
+  for (let combination of WINNING_TEMPLATE) {
+    const firstSymol = board[combination[0].row][combination[0].col];
+    const secondSymol = board[combination[1].row][combination[1].col];
+    const thirdSymol = board[combination[2].row][combination[2].col];
+
+    if (firstSymol && firstSymol === secondSymol && secondSymol === thirdSymol) {
+      winner = firstSymol
+    }
+  }
 
   const handlePlayerTurns = (rowIndex, colIndex) => {
     setGameTurn(prev => {
@@ -36,7 +61,6 @@ function App() {
 
   const handleStartGame = () => {
     setStartGame(prev => !prev);
-    let firstSymbol = firstRun ? "X" : "O";
   }
 
   return (
@@ -49,9 +73,13 @@ function App() {
         {!startGame ? <div id="pre-game">
           <button onClick={handleStartGame}>StartGame</button>
         </div> :
-          <GameBoard handlePlayerTurns={handlePlayerTurns} turns={gameTurn} />}
+          <>
+            {winner && "You won"}
+            <GameBoard handlePlayerTurns={handlePlayerTurns} gameOver={!!winner} board={board} />
+          </>
+        }
       </div>
-      <Log turns={gameTurn}/>
+      <Log turns={gameTurn} />
     </main>
   )
 }
